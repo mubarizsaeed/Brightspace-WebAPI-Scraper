@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SmartSchedule Python Script</title>
+    <script src="https://thunkable.github.io/webviewer-extension/thunkableWebviewerExtension.js" type="text/javascript"></script>
+    <style>
+        @font-face {
+            font-family: 'SF Compact Display Black';
+            src: url('/static/SF-Compact-Display-Black.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'SF Compact Display Black', Arial, sans-serif;
+            background-color: #002147;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        form {
+            max-width: 300px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #999;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        #loadingScreen {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+        }
+
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #007BFF;
+        }
+
+        #duoCodeContainer {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #runScriptButton,
+        #useDuoCodeButton,
+        #sendDuoCodeButton {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'SF Compact Display Black', Arial, sans-serif;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #duoCodeMessage {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .lds-roller {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            bottom: 8px; /* Adjust the position as needed */
+            right: 2px; /* Adjust the position as needed */
+            width: 50px;
+            height: 50px;
+            transform: scale(0.8); 
+        }
+
+        .lds-roller div {
+            animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            transform-origin: 32px 32px;
+        }
+
+        .lds-roller div:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #007BFF;
+            margin: -3px 0 0 -3px;
+        }
+
+        .lds-roller div:nth-child(1) {
+            animation-delay: -0.036s;
+        }
+
+        .lds-roller div:nth-child(1):after {
+            top: 50px;
+            left: 50px;
+        }
+
+        .lds-roller div:nth-child(2) {
+            animation-delay: -0.072s;
+        }
+
+        .lds-roller div:nth-child(2):after {
+            top: 54px;
+            left: 45px;
+        }
+
+        .lds-roller div:nth-child(3) {
+            animation-delay: -0.108s;
+        }
+
+        .lds-roller div:nth-child(3):after {
+            top: 57px;
+            left: 39px;
+        }
+
+        .lds-roller div:nth-child(4) {
+            animation-delay: -0.144s;
+        }
+
+        .lds-roller div:nth-child(4):after {
+            top: 58px;
+            left: 32px;
+        }
+
+        .lds-roller div:nth-child(5) {
+            animation-delay: -0.18s;
+        }
+
+        .lds-roller div:nth-child(5):after {
+            top: 57px;
+            left: 25px;
+        }
+
+        .lds-roller div:nth-child(6) {
+            animation-delay: -0.216s;
+        }
+
+        .lds-roller div:nth-child(6):after {
+            top: 54px;
+            left: 19px;
+        }
+
+        .lds-roller div:nth-child(7) {
+            animation-delay: -0.252s;
+        }
+
+        .lds-roller div:nth-child(7):after {
+            top: 50px;
+            left: 14px;
+        }
+
+        .lds-roller div:nth-child(8) {
+            animation-delay: -0.288s;
+        }
+
+        .lds-roller div:nth-child(8):after {
+            top: 45px;
+            left: 10px;
+        }
+
+        @keyframes lds-roller {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Enter Brightspace Credentials</h2>
+    <form id="authForm">
+        <div id="authMethodContainer">
+            <label>Authentication Method:</label>
+            <input type="radio" name="authMethod" value="duoCodeMobile" onclick="toggleEnterTextCode(true)">Duo Code Mobile
+            <input type="radio" name="authMethod" value="duoPush" onclick="toggleEnterTextCode(false)">Duo Push
+        </div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Password">
+        <button id="runScriptButton" type="button">Run Sync</button>
+        <div class="button-container" id="enterTextCodeContainer" style="display: none;">
+            <button id="useDuoCodeButton" type="button" onclick="toggleDuoCode()">Enter Text Code</button>
+        </div>
+        <div id="duoCodeContainer">
+            <label for="duoCode">Duo Mobile Code:</label>
+            <input type="text" id="duoCode" name="duoCode" placeholder="Duo Mobile Code">
+            <button id="sendDuoCodeButton" type="button">Send Duo Code</button>
+        </div>
+        <!-- Loading icon div -->
+        <div id="loadingScreen" class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </form>
+    <div id="result"></div>
+    <script>
+        const runScriptButton = document.getElementById('runScriptButton');
+        const sendDuoCodeButton = document.getElementById('sendDuoCodeButton');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const duoCodeContainer = document.getElementById('duoCodeContainer');
+        const enterTextCodeContainer = document.getElementById('enterTextCodeContainer');
+
+        function toggleDuoCode() {
+            const isVisible = duoCodeContainer.style.display === 'flex';
+            duoCodeContainer.style.display = isVisible ? 'none' : 'flex';
+            const bottomValue = isVisible ? '100px' : '20px';
+            loadingScreen.style.bottom = bottomValue;
+        }
+
+        function toggleEnterTextCode(showEnterTextCode) {
+            enterTextCodeContainer.style.display = showEnterTextCode ? 'flex' : 'none';
+        }
+
+        sendDuoCodeButton.addEventListener('click', function () {
+            const duoCode = document.getElementById('duoCode').value;
+
+            if (duoCode) {
+                sendDuoCodeButton.style.backgroundColor = '#90EE90';
+                fetch('/send_duo_code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            duoCode
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {})
+                    .catch(error => {});
+            }
+        });
+
+        runScriptButton.addEventListener('click', function () {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const authMethod = document.querySelector('input[name="authMethod"]:checked').value;
+
+            document.getElementById('result').innerText = 'Check Duo App Or Wait for text';
+
+            loadingScreen.style.display = 'block';
+            runScriptButton.disabled = true;
+
+            fetch('/run_script', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        authMethod
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const outputArray = data.output;
+                    const outputArrayString = JSON.stringify(outputArray);
+
+                    document.getElementById('result').innerText =
+                        `Smart Schedule Sync Complete. 
+                        Token: ${outputArray[0]},
+                        Username: ${outputArray[1]}`
+
+                    ThunkableWebviewerExtension.postMessage(outputArrayString);
+                })
+                .catch(error => {
+                    document.getElementById('result').innerText = "Error: " + error;
+                })
+                .finally(() => {
+                    loadingScreen.style.display = 'none';
+                    runScriptButton.disabled = false;
+                });
+        });
+    </script>
+</body>
+
+</html>
