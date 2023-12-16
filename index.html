@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSchedule - Your All-in-One Calendar App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css">
+    <style>
+        .content h2 {
+            font-size: 40px; /* Adjust the font size as needed */
+        }
+
+        .content p {
+            font-size: 28px; /* Adjust the font size as needed */
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="app-section" id="home-section">
+        <header>
+            <div class="logo">
+                <img src="images/SmartScheduleLogo.png" alt="SmartSchedule Logo" class="logo-image">
+                <h2><a href="#" class="logo-text">SmartSchedule</a></h2>
+            </div>
+            <label for="check" onclick="toggleNavigation()">
+                <i class="fas fa-bars"></i>
+            </label>
+            <div class="navigation">
+                <a href="#" onclick="showSection('home-section')">Home</a>
+                <a href="#" onclick="showSection('how-section')">How To</a>
+                <a href="#" onclick="showSection('try-app-section')">Try App</a>
+            </div>
+        </header>
+        <div class="content">
+            <div class="info">
+                <h2>Welcome to SmartSchedule</h2>
+                <p>SmartSchedule streamlines academic life by integrating with Brightspace, consolidating classes, and simplifying coursework. The app also features a shuttle tracker and map to help students find their classes.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="app-section" id="how-section" style="display: none;">
+        <header>
+            <div class="logo">
+                <img src="images/SmartScheduleLogo.png" alt="SmartSchedule Logo" class="logo-image">
+                <h2><a href="#" class="logo-text">SmartSchedule</a></h2>
+            </div>
+            <label for="check" onclick="toggleNavigation()">
+                <i class="fas fa-bars"></i>
+            </label>
+            <div class="navigation">
+                <a href="#" onclick="showSection('home-section')">Home</a>
+                <a href="#" onclick="showSection('how-section')" class="active">How To</a>
+                <a href="#" onclick="showSection('try-app-section')">Try App</a>
+            </div>
+        </header>
+        <div class="content">
+            <h2>SmartSchedule Instructional Video </h2>
+            <p>Learn how to make the most of SmartSchedule with this instructional video:</p>
+            <iframe width="1280" height="720" src="https://www.youtube.com/embed/vp1WL-rDGR0?si=pwnx-gvYSF_o208D" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <section class="app-section" id="try-app-section" style="display: none;">
+        <header>
+            <div class="logo">
+                <img src="images/SmartScheduleLogo.png" alt="SmartSchedule Logo" class="logo-image">
+                <h2><a href="#" class="logo-text">SmartSchedule</a></h2>
+            </div>
+            <label for="check" onclick="toggleNavigation()">
+                <i class="fas fa-bars"></i>
+            </label>
+            <div class="navigation">
+                <a href="#" onclick="showSection('home-section')">Home</a>
+                <a href="#" onclick="showSection('how-section')">How To</a>
+                <a href="#" onclick="showSection('try-app-section')" class="active">Try App</a>
+            </div>
+        </header>
+        <div class="content">
+            <h2>Try SmartSchedule App</h2>
+            <p>Experience the power of SmartSchedule right here on our website. Use the embedded app below to explore its features.</p>
+            <iframe src="https://thunkable.site/w/BVfA7U-TF92wlDs_GtKoL" title="SmartSchedule Thunkable App" height="1000" width="500"></iframe>
+        </div>
+    </section>
+
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.app-section').forEach(function (section) {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+
+            // For smaller screens, hide the navigation links after a link is clicked
+            if (window.innerWidth <= 960) {
+                document.querySelector('.navigation').style.display = 'none';
+            }
+        }
+
+        function toggleNavigation() {
+            var navigation = document.querySelector('.navigation');
+            navigation.style.display = (navigation.style.display === 'none' || navigation.style.display === '') ? 'flex' : 'none';
+        }
+
+        // Ensure that Lottie animation does not interfere with clicks on the body
+        document.body.addEventListener('click', function () {
+            if (window.innerWidth <= 960) {
+                document.querySelector('.navigation').style.display = 'none';
+            }
+        });
+
+        // Prevent clicks on Lottie container from propagating to the body
+        document.querySelector('.lottie-container').addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+    </script>
+
+    <div class="lottie-container" style="z-index: -1;">
+        <dotlottie-player src="https://lottie.host/c701cfb1-2f2e-473f-aa8e-367217e152b6/5NHq51eidH.json"
+            background="transparent" speed="0.7" style="width: 600px; height: 600px;" loop autoplay direction="3">
+        </dotlottie-player>
+    </div>
+
+</body>
+
+</html>
